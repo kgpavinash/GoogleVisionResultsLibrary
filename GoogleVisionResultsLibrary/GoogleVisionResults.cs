@@ -97,9 +97,17 @@ namespace GoogleVisionResultsLibrary
                 Google.Cloud.Vision.V1.Image image = Google.Cloud.Vision.V1.Image.FromFile(srcFilePath);
                 var responseText = client.DetectText(image);
                 var responseDocument = client.DetectDocumentText(image);
-                if(responseDocument == null)
+                if(responseText.Count == 0 && responseDocument == null)
                 {
-                    throw new EmptyResultsException("Google Vision could not find any text.");
+                    throw new EmptyResultsException("Google Vision could not find any text from DetectText and DetectDocumentText methods.");
+                }
+                if (responseText.Count == 0)
+                {
+                    throw new EmptyDetectTextException("Google Vision could not find any text from DetectText method");
+                }
+                if (responseDocument == null)
+                {
+                    throw new EmptyDetectDocumentTextException("Google Vision could not find any text from DetectDocumentText method");
                 }
                 string responseTextJson = JsonConvert.SerializeObject(responseText);
                 string responseDocumentJson = JsonConvert.SerializeObject(responseDocument);
@@ -111,19 +119,19 @@ namespace GoogleVisionResultsLibrary
                 }
                 string responseDocumentOnlyText = responseDocument.Text;
                 // Write data to the four files
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + "GTR"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + ".GTR"))
                 {
                     sw.Write(responseTextJson);
                 }
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + "GTT"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + ".GTT"))
                 {
                     sw.Write(responseTextOnlyText);
                 }
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + "GDR"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + ".GDR"))
                 {
                     sw.Write(responseDocumentJson);
                 }
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + "GDT"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + srcFileNameNoExt + ".GDT"))
                 {
                     sw.Write(responseDocumentOnlyText);
                 }
@@ -212,19 +220,19 @@ namespace GoogleVisionResultsLibrary
                 //destination.Write(responseTextOnlyTextBytes, responseTextJsonBytes.Length, responseTextOnlyTextBytes.Length);
 
                 // Write data to the four files
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + "GTR"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + ".GTR"))
                 {
                     sw.Write(responseTextJson);
                 }
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + "GTT"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + ".GTT"))
                 {
                     sw.Write(responseTextOnlyText);
                 }
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + "GDR"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + ".GDR"))
                 {
                     sw.Write(responseDocumentJson);
                 }
-                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + "GDT"))
+                using (StreamWriter sw = new StreamWriter(destDirPath + "\\" + destFileName + ".GDT"))
                 {
                     sw.Write(responseDocumentOnlyText);
                 }
@@ -247,6 +255,20 @@ namespace GoogleVisionResultsLibrary
     public class EmptyResultsException : Exception
     {
         public EmptyResultsException(string message) : base(message)
+        {
+
+        }
+    }
+    public class EmptyDetectTextException : Exception
+    {
+        public EmptyDetectTextException(string message) : base(message)
+        {
+
+        }
+    }
+    public class EmptyDetectDocumentTextException : Exception
+    {
+        public EmptyDetectDocumentTextException(string message) : base(message)
         {
 
         }
